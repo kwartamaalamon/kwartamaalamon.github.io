@@ -292,6 +292,32 @@ function openRegister() {
     <div class="footer-links">
       <a href="about.html">About Us</a> | 
       <a href="disclaimer.html">Disclaimer</a>
+      <!-- ✅ LIKE, SHARE & SUBSCRIBE -->
+<div class="action-buttons">
+  <!-- LIKE BUTTON -->
+  <button class="btn-like" onclick="toggleLike('binance-return-philippines')">
+    ❤️ Like <span id="like-count-binance-return-philippines">0</span>
+  </button>
+
+  <!-- SUBSCRIBE BUTTON -->
+  <button class="btn-subscribe" onclick="subscribeToUpdates()">
+    📩 Subscribe
+  </button>
+
+  <!-- SHARE BUTTONS -->
+  <div class="share-buttons">
+    <span>Share:</span>
+    <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=https://kwartamaalamon.github.io/binance-return-philippines.html" target="_blank">Facebook</a>
+    <a class="share-btn" href="https://t.me/share/url?url=https://kwartamaalamon.github.io/binance-return-philippines.html" target="_blank">Telegram</a>
+    <a class="share-btn" href="https://api.whatsapp.com/send?text=Check this out: https://kwartamaalamon.github.io/binance-return-philippines.html" target="_blank">WhatsApp</a>
+    <a class="share-btn" href="#" onclick="navigator.clipboard.writeText('https://kwartamaalamon.github.io/binance-return-philippines.html');alert('Link copied!'); return false;">Copy Link</a>
+  </div>
+</div>
+
+<script>
+// Load existing like count when page opens
+loadLikeCount('binance-return-philippines');
+</script>
     </div>
     <p>© 2026 Kwarta Maalamon | All rights reserved</p>
   </footer>
