@@ -75,7 +75,41 @@
     <h1>Kwarta Maalamon</h1>
     <p>Simple, clear money tips for Cebu, Visayas & all Filipinos</p>
   </header>
+<!-- ✅ EXCHANGE RATE BOX - Kwarta Maalamon -->
+<div style="background:white; padding:18px; border-radius:8px; box-shadow:0 1px 3px #ddd; margin:20px 0;">
+  <h3 style="color:#2c5aa0; margin-top:0; font-size:18px;">💱 Current Exchange Rates (1 Unit → Philippine Peso)</h3>
+  <div id="rates-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px; margin-top:10px;">
+    <div><strong>USD:</strong> <span id="usd">loading...</span></div>
+    <div><strong>KRW:</strong> <span id="krw">loading...</span></div>
+    <div><strong>JPY:</strong> <span id="jpy">loading...</span></div>
+    <div><strong>GBP:</strong> <span id="gbp">loading...</span></div>
+    <div><strong>EUR:</strong> <span id="eur">loading...</span></div>
+    <div><strong>SAR:</strong> <span id="sar">loading...</span></div>
+    <div><strong>SGD:</strong> <span id="sgd">loading...</span></div>
+  </div>
+  <p style="font-size:12px; color:#777; margin:8px 0 0 0;">*Rates updated daily | For reference only</p>
+</div>
 
+<!-- ✅ SCRIPT - LIVE RATES -->
+<script>
+// List exactly what you want
+const currencies = ['USD','KRW','JPY','GBP','EUR','SAR','SGD'];
+
+// Fetch free data (no API key needed)
+fetch('https://api.exchangerate-api.com/v4/latest/PHP')
+.then(res => res.json())
+.then(data => {
+  const baseRate = data.rates;
+  currencies.forEach(cur => {
+    // Formula: 1 Foreign Currency = PHP
+    const rate = (1 / baseRate[cur]).toFixed(2);
+    document.getElementById(cur.toLowerCase()).textContent = '₱' + rate;
+  });
+})
+.catch(() => {
+  document.getElementById('rates-container').innerHTML = '<p style="color:red;">Rates unavailable right now</p>';
+});
+</script>
   <nav>
     <a href="/">Home</a>
   </nav>
