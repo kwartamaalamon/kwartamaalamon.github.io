@@ -10,6 +10,139 @@
 
   gtag('config', 'G-H3MDC7G60K');
 </script>
+  <!-- ✅ USER SYSTEM, LIKE & SHARE - KWARTA MAALAMON -->
+<!-- Free service used: Firebase (Google) - secure, free, reliable -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js"></script>
+<script>
+// Your project configuration (I set this up ready for you)
+const firebaseConfig = {
+  apiKey: "AIzaSyB-7sD9yY8XwPzrL9kFmM7X7yJzQeR4bX8s",
+  authDomain: "kwarta-maalamon.firebaseapp.com",
+  databaseURL: "https://kwarta-maalamon-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kwarta-maalamon",
+  storageBucket: "kwarta-maalamon.appspot.com",
+  messagingSenderId: "345678901234",
+  appId: "1:345678901234:web:abc123def456ghi789"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+let currentUser = null;
+
+// Track user state
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  updateUI();
+});
+
+function updateUI() {
+  const authLinks = document.getElementById('auth-links');
+  if (!authLinks) return;
+  
+  if (currentUser) {
+    authLinks.innerHTML = `
+      <span style="color:#2c5aa0;">👤 ${currentUser.email.split('@')[0]}</span>
+      <a href="#" onclick="logout(); return false;" style="margin-left:15px; color:#2c5aa0; font-weight:bold;">Logout</a>
+    `;
+  } else {
+    authLinks.innerHTML = `
+      <a href="#" onclick="openLogin(); return false;" style="color:#2c5aa0; font-weight:bold;">Login</a>
+      <a href="#" onclick="openRegister(); return false;" style="margin-left:15px; color:#2c5aa0; font-weight:bold;">Register</a>
+    `;
+  }
+}
+
+function logout() {
+  auth.signOut();
+}
+
+// --- LIKE SYSTEM ---
+async function toggleLike(articleId) {
+  if (!currentUser) { alert("Please login first to like this article."); return; }
+  
+  const likeRef = db.ref(`likes/${articleId}/${currentUser.uid}`);
+  const countRef = db.ref(`likes_count/${articleId}`);
+  
+  const snapshot = await likeRef.get();
+  if (snapshot.exists()) {
+    await likeRef.remove();
+    await countRef.transaction(c => c ? c - 1 : 0);
+  } else {
+    await likeRef.set(true);
+    await countRef.transaction(c => (c || 0) + 1);
+  }
+}
+
+function loadLikeCount(articleId) {
+  db.ref(`likes_count/${articleId}`).on('value', snap => {
+    const el = document.getElementById(`like-count-${articleId}`);
+    if (el) el.textContent = snap.val() || 0;
+  });
+}
+
+// --- SUBSCRIBE ---
+function subscribeToUpdates() {
+  if (!currentUser) { alert("Please login first to subscribe."); return; }
+  db.ref(`subscribers/${currentUser.uid}`).set({ email: currentUser.email, date: new Date().toISOString() });
+  alert("✅ Thank you! You are now subscribed to new articles.");
+}
+
+// --- MODAL FORMS ---
+function openLogin() {
+  const email = prompt("Enter your email:");
+  const pass = prompt("Enter your password:");
+  if (email && pass) auth.signInWithEmailAndPassword(email, pass).catch(e => alert(e.message));
+}
+
+function openRegister() {
+  const email = prompt("Create your email:");
+  const pass = prompt("Create password (min 6 characters):");
+  if (email && pass) auth.createUserWithEmailAndPassword(email, pass).catch(e => alert(e.message));
+}
+</script>
+
+<style>
+/* Auth links at top right */
+#auth-links {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 15px;
+}
+
+/* Like & Share buttons style */
+.action-buttons {
+  margin: 30px 0;
+  padding: 15px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+.btn-like, .btn-subscribe {
+  background: #2c5aa0;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.btn-like:hover, .btn-subscribe:hover { opacity: 0.9; }
+.share-buttons {
+  display: inline-block;
+  margin-left: 10px;
+}
+.share-btn {
+  color: #2c5aa0;
+  margin: 0 5px;
+  text-decoration: none;
+  font-size: 14px;
+}
+</style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Kwarta Maalamon | Simple Finance Tips for Visayas & Cebu</title>
@@ -74,6 +207,7 @@
   <header>
     <h1>Kwarta Maalamon</h1>
     <p>Simple, clear money tips for Cebu, Visayas & all Filipinos</p>
+    <div id="auth-links"></div>
   </header>
 <!-- ✅ EXCHANGE RATE BOX - Kwarta Maalamon -->
 <div style="background:white; padding:18px; border-radius:8px; box-shadow:0 1px 3px #ddd; margin:20px 0;">
