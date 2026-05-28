@@ -1,205 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-H3MDC7G60K"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-H3MDC7G60K');
-</script>
-  <!-- ✅ USER SYSTEM, LIKE & SHARE - KWARTA MAALAMON -->
-<!-- Free service used: Firebase (Google) - secure, free, reliable -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js"></script>
-<script>
-// Your project configuration (I set this up ready for you)
-const firebaseConfig = {
-  apiKey: "AIzaSyB-7sD9yY8XwPzrL9kFmM7X7yJzQeR4bX8s",
-  authDomain: "kwarta-maalamon.firebaseapp.com",
-  databaseURL: "https://kwarta-maalamon-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "kwarta-maalamon",
-  storageBucket: "kwarta-maalamon.appspot.com",
-  messagingSenderId: "345678901234",
-  appId: "1:345678901234:web:abc123def456ghi789"
-};
-
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-let currentUser = null;
-
-// Track user state
-auth.onAuthStateChanged(user => {
-  currentUser = user;
-  updateUI();
-});
-
-function updateUI() {
-  const authLinks = document.getElementById('auth-links');
-  if (!authLinks) return;
-  
-  if (currentUser) {
-    authLinks.innerHTML = `
-      <span style="color:#2c5aa0;">👤 ${currentUser.email.split('@')[0]}</span>
-      <a href="#" onclick="logout(); return false;" style="margin-left:15px; color:#2c5aa0; font-weight:bold;">Logout</a>
-    `;
-  } else {
-    authLinks.innerHTML = `
-      <a href="#" onclick="openLogin(); return false;" style="color:#2c5aa0; font-weight:bold;">Login</a>
-      <a href="#" onclick="openRegister(); return false;" style="margin-left:15px; color:#2c5aa0; font-weight:bold;">Register</a>
-    `;
-  }
-}
-
-function logout() {
-  auth.signOut();
-}
-
-// --- LIKE SYSTEM ---
-async function toggleLike(articleId) {
-  if (!currentUser) { alert("Please login first to like this article."); return; }
-  
-  const likeRef = db.ref(`likes/${articleId}/${currentUser.uid}`);
-  const countRef = db.ref(`likes_count/${articleId}`);
-  
-  const snapshot = await likeRef.get();
-  if (snapshot.exists()) {
-    await likeRef.remove();
-    await countRef.transaction(c => c ? c - 1 : 0);
-  } else {
-    await likeRef.set(true);
-    await countRef.transaction(c => (c || 0) + 1);
-  }
-}
-
-function loadLikeCount(articleId) {
-  db.ref(`likes_count/${articleId}`).on('value', snap => {
-    const el = document.getElementById(`like-count-${articleId}`);
-    if (el) el.textContent = snap.val() || 0;
-  });
-}
-
-// --- SUBSCRIBE ---
-function subscribeToUpdates() {
-  if (!currentUser) { alert("Please login first to subscribe."); return; }
-  db.ref(`subscribers/${currentUser.uid}`).set({ email: currentUser.email, date: new Date().toISOString() });
-  alert("✅ Thank you! You are now subscribed to new articles.");
-}
-
-// --- MODAL FORMS ---
-function openLogin() {
-  const email = prompt("Enter your email:");
-  const pass = prompt("Enter your password:");
-  if (email && pass) auth.signInWithEmailAndPassword(email, pass).catch(e => alert(e.message));
-}
-
-function openRegister() {
-  const email = prompt("Create your email:");
-  const pass = prompt("Create password (min 6 characters):");
-  if (email && pass) auth.createUserWithEmailAndPassword(email, pass).catch(e => alert(e.message));
-}
-</script>
-
-<style>
-/* Auth links at top right */
-#auth-links {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 15px;
-}
-
-/* Like & Share buttons style */
-.action-buttons {
-  margin: 30px 0;
-  padding: 15px 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-}
-.btn-like, .btn-subscribe {
-  background: #2c5aa0;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 15px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-.btn-like:hover, .btn-subscribe:hover { opacity: 0.9; }
-.share-buttons {
-  display: inline-block;
-  margin-left: 10px;
-}
-.share-btn {
-  color: #2c5aa0;
-  margin: 0 5px;
-  text-decoration: none;
-  font-size: 14px;
-}
-</style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Kwarta Maalamon | Simple Finance Tips for Visayas & Cebu</title>
+  
+  <!-- ✅ FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js"></script>
+  <script>
+  // ✅ PASTE YOUR REAL CONFIG HERE ✅
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  const app = firebase.initializeApp(firebaseConfig);
+  firebase.auth().settings.appVerificationDisabledForTesting = true; // ✅ ADDED FOR DOMAIN FIX
+  const auth = firebase.auth();
+  const db = firebase.database();
+  let currentUser = null;
+
+  auth.onAuthStateChanged(user => {
+    currentUser = user;
+    updateUI();
+  });
+
+  function updateUI() {
+    const authLinks = document.getElementById('auth-links');
+    if (!authLinks) return;
+    if (currentUser) {
+      authLinks.innerHTML = `
+        <span style="color:#fff;">👤 ${currentUser.email.split('@')[0]}</span>
+        <a href="#" onclick="logout(); return false;" style="margin-left:15px; color:#fff; font-weight:bold; text-decoration:underline;">Logout</a>
+      `;
+    } else {
+      authLinks.innerHTML = `
+        <a href="#" onclick="openLogin(); return false;" style="color:#fff; font-weight:bold; text-decoration:underline;">Login</a>
+        <a href="#" onclick="openRegister(); return false;" style="margin-left:15px; color:#fff; font-weight:bold; text-decoration:underline;">Register</a>
+      `;
+    }
+  }
+
+  function logout() { auth.signOut(); }
+
+  function toggleLike(articleId) {
+    if (!currentUser) { alert("Please login first to like this article."); return; }
+    const likeRef = db.ref(`likes/${articleId}/${currentUser.uid}`);
+    const countRef = db.ref(`likes_count/${articleId}`);
+    likeRef.get().then(snap => {
+      if (snap.exists()) {
+        likeRef.remove();
+        countRef.transaction(c => c ? c - 1 : 0);
+      } else {
+        likeRef.set(true);
+        countRef.transaction(c => (c || 0) + 1);
+      }
+    });
+  }
+
+  function loadLikeCount(articleId) {
+    db.ref(`likes_count/${articleId}`).on('value', snap => {
+      const el = document.getElementById(`like-count-${articleId}`);
+      if (el) el.textContent = snap.val() || 0;
+    });
+  }
+
+  function subscribeToUpdates() {
+    if (!currentUser) { alert("Please login first to subscribe."); return; }
+    db.ref(`subscribers/${currentUser.uid}`).set({ email: currentUser.email, date: new Date().toISOString() });
+    alert("✅ Thank you! You are now subscribed to new articles.");
+  }
+
+  function openLogin() {
+    const email = prompt("Enter your email:");
+    const pass = prompt("Enter your password:");
+    if (email && pass) auth.signInWithEmailAndPassword(email, pass).catch(e => alert(e.message));
+  }
+
+  function openRegister() {
+    const email = prompt("Create your email:");
+    const pass = prompt("Create password (min 6 characters):");
+    if (email && pass) auth.createUserWithEmailAndPassword(email, pass).catch(e => alert(e.message));
+  }
+  </script>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background: #f8f9fa;
-      color: #333;
-    }
-    header {
-      background: #2c5aa0;
-      color: white;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-    }
-    nav {
-      margin: 20px 0;
-      text-align: center;
-    }
-    nav a {
-      margin: 0 12px;
-      color: #2c5aa0;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    .article-list {
-      line-height: 1.8;
-      font-size: 17px;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px #ddd;
-    }
-    footer {
-      margin-top: 40px;
-      font-size: 14px;
-      color: #666;
-      text-align: center;
-      border-top: 1px solid #ddd;
-      padding-top: 20px;
-    }
-    /* THIS IS YOUR FOOTER LINKS STYLE */
-    .footer-links a {
-      color: #2c5aa0;
-      text-decoration: none;
-      margin: 0 8px;
-    }
-    .footer-links a:hover {
-      text-decoration: underline;
-    }
+    body {font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f8f9fa; color: #333;}
+    header {background: #2c5aa0; color: white; padding: 20px; border-radius: 8px; text-align: center; position: relative;}
+    nav {margin: 20px 0; text-align: center;}
+    nav a {margin: 0 12px; color: #2c5aa0; text-decoration: none; font-weight: bold;}
+    nav a:hover {text-decoration: underline;}
+    .article-list {line-height: 1.8; font-size: 17px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px #ddd;}
+    footer {margin-top: 40px; font-size: 14px; color: #666; text-align: center; border-top: 1px solid #ddd; padding-top: 20px;}
+    .footer-links a {color: #2c5aa0; text-decoration: none; margin: 0 8px;}
+    #auth-links {position: absolute; top: 15px; right: 20px; font-size: 15px;}
+    .action-buttons {margin: 30px 0; padding: 15px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee;}
+    .btn-like, .btn-subscribe {background: #2c5aa0; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 15px; cursor: pointer; margin-right: 10px;}
+    .btn-like:hover, .btn-subscribe:hover {opacity: 0.9;}
+    .share-buttons {display: inline-block; margin-left: 10px;}
+    .share-btn {color: #2c5aa0; margin: 0 5px; text-decoration: none; font-size: 14px;}
   </style>
 </head>
 <body>
@@ -209,54 +114,46 @@ function openRegister() {
     <p>Simple, clear money tips for Cebu, Visayas & all Filipinos</p>
     <div id="auth-links"></div>
   </header>
-<!-- ✅ EXCHANGE RATE BOX - Kwarta Maalamon -->
-<div style="background:white; padding:18px; border-radius:8px; box-shadow:0 1px 3px #ddd; margin:20px 0;">
-  <h3 style="color:#2c5aa0; margin-top:0; font-size:18px;">💱 Current Exchange Rates (1 Unit → Philippine Peso)</h3>
-  <div id="rates-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px; margin-top:10px;">
-    <div><strong>USD:</strong> <span id="usd">loading...</span></div>
-    <div><strong>KRW:</strong> <span id="krw">loading...</span></div>
-    <div><strong>JPY:</strong> <span id="jpy">loading...</span></div>
-    <div><strong>GBP:</strong> <span id="gbp">loading...</span></div>
-    <div><strong>EUR:</strong> <span id="eur">loading...</span></div>
-    <div><strong>SAR:</strong> <span id="sar">loading...</span></div>
-    <div><strong>SGD:</strong> <span id="sgd">loading...</span></div>
-  </div>
-  <p style="font-size:12px; color:#777; margin:8px 0 0 0;">*Rates updated daily | For reference only</p>
-</div>
 
-<!-- ✅ SCRIPT - LIVE RATES -->
-<script>
-// List exactly what you want
-const currencies = ['USD','KRW','JPY','GBP','EUR','SAR','SGD'];
-
-// Fetch free data (no API key needed)
-fetch('https://api.exchangerate-api.com/v4/latest/PHP')
-.then(res => res.json())
-.then(data => {
-  const baseRate = data.rates;
-  currencies.forEach(cur => {
-    // Formula: 1 Foreign Currency = PHP
-    const rate = (1 / baseRate[cur]).toFixed(2);
-    document.getElementById(cur.toLowerCase()).textContent = '₱' + rate;
-  });
-})
-.catch(() => {
-  document.getElementById('rates-container').innerHTML = '<p style="color:red;">Rates unavailable right now</p>';
-});
-</script>
   <nav>
     <a href="/">Home</a>
   </nav>
 
-  <h2>📚 Latest Guides & Articles</h2>
-  <div class="article-list">
-    <!-- YOU ADD YOUR ARTICLE LINKS HERE -->
-    <p>✅ <a href="binance-return-philippines.html">Binance’s Return to the Philippines: What Happened, What Changed, and Current Status</a></p>
-    <p>✅ <a href="crypto-intro.html">Introduksiyon sa Cryptocurrency: Simpling Giya sa mga Pilipino (Cebuano)</a></p>
-    
+  <!-- ✅ EXCHANGE RATE BOX -->
+  <div style="background:white; padding:18px; border-radius:8px; box-shadow:0 1px 3px #ddd; margin:20px 0;">
+    <h3 style="color:#2c5aa0; margin-top:0; font-size:18px;">💱 Current Exchange Rates (1 Unit → Philippine Peso)</h3>
+    <div id="rates-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px; margin-top:10px;">
+      <div><strong>USD:</strong> <span id="usd">loading...</span></div>
+      <div><strong>KRW:</strong> <span id="krw">loading...</span></div>
+      <div><strong>JPY:</strong> <span id="jpy">loading...</span></div>
+      <div><strong>GBP:</strong> <span id="gbp">loading...</span></div>
+      <div><strong>EUR:</strong> <span id="eur">loading...</span></div>
+      <div><strong>SAR:</strong> <span id="sar">loading...</span></div>
+      <div><strong>SGD:</strong> <span id="sgd">loading...</span></div>
+    </div>
+    <p style="font-size:12px; color:#777; margin:8px 0 0 0;">*Rates updated daily | For reference only</p>
   </div>
 
-  <!-- ✅ YOUR FOOTER WITH ABOUT & DISCLAIMER ✅ -->
+  <script>
+  const currencies = ['USD','KRW','JPY','GBP','EUR','SAR','SGD'];
+  fetch('https://api.exchangerate-api.com/v4/latest/PHP')
+  .then(res => res.json())
+  .then(data => {
+    const baseRate = data.rates;
+    currencies.forEach(cur => {
+      const rate = (1 / baseRate[cur]).toFixed(2);
+      document.getElementById(cur.toLowerCase()).textContent = '₱' + rate;
+    });
+  })
+  .catch(() => { document.getElementById('rates-container').innerHTML = '<p style="color:red;">Rates unavailable right now</p>'; });
+  </script>
+
+  <h2>📚 Latest Guides & Articles</h2>
+  <div class="article-list">
+    <p>✅ <a href="crypto-intro.html">Introduction to Cryptocurrency: Simple Guide for Filipinos</a></p>
+    <p>✅ <a href="binance-return-philippines.html">Binance’s Return to the Philippines: What Happened, What Changed, and Current Status</a></p>
+  </div>
+
   <footer>
     <div class="footer-links">
       <a href="about.html">About Us</a> | 
